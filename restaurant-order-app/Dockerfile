@@ -1,6 +1,6 @@
 # 使用多階段構建來優化映像大小
 # 階段 1: 構建階段
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # 設置工作目錄
 WORKDIR /app
