@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: restaurant-postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - restaurant-network
+
+  api:
+    build: 
+      context: ./src/RestaurantOrder.WebApi
+      dockerfile: Dockerfile
+    container_name: restaurant-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=mydb;Username=admin;Password=secret"
+      Jwt__SecretKey: "your-super-secret-jwt-key-that-must-be-at-least-256-bits-long-for-security"
+      Jwt__Issuer: "restaurant-order-api"
+      Jwt__Audience: "restaurant-order-client"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - restaurant-network
+
+volumes:
+  postgres_data:
+
+networks:
+  restaurant-network:
+    driver: bridge
